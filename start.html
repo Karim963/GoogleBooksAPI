@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">Book Finder</h1>
+        <div class="row">
+            <div id="ínput">
+                <input id="search-box" type="text" class="form-control" placeholder="Harry Potter">
+                <button id="search" onclick=""></button>
+            </div>
+        </div>
+    </div>
+<div class="book-list" id="delete-soon">
+    <h2>Results</h2>
+    <div id="list-output">
+        <div class="row">
+
+        </div>
+    </div>
+</div>
+    <form class="form" id="list-input">
+
+    </form>
+
+<script>
+    $(document).ready(function(){
+        var item,title,author,publisher,bookLink,bookImg,price;
+        var InfoBook,InfoAuthor,InfoPublisher;
+        var email,phone,name,address;
+        var outputList=document.getElementById("list-output")
+        var bookUrl="https://www.googleapis.com/books/v1/volumes?q="
+        var searchData;
+        var inputList=document.getElementById("list-input")
+
+        $("#search").click(function(){
+            outputList.innerHTML=""
+            searchData=$("#search-box").val();
+            if(searchData==="" || searchData===null){
+                displayError();
+            }
+            else{
+                $.ajax({
+                    url:bookUrl+searchData,
+                    dataType:"json",
+                    success: function(res){
+                        console.log(res)
+                        if(res.totalItems===0){
+                            alert("nothing")
+                        }
+                        else{
+                            displayResults(res);
+                        }
+                    },
+                    error: function (){
+                        alert("Something went wrong!");
+                    }
+                })
+            }
+            $("#search-box").val("");
+        })
+        function displayResults(res){
+            for(var i=0; i<res.items.length;i+=2){
+                item=res.items[i];
+                title1=item.volumeInfo.title;
+                author1=item.volumeInfo.authors;
+                publisher1=item.volumeInfo.publisher;
+                price1= item.saleInfo && item.saleInfo.listPrice ? item.saleInfo.listPrice.amount : "0";
+                current1=item.saleInfo && item.saleInfo.listPrice ? item.saleInfo.listPrice.currencyCode: "Not available";
+
+                item2=res.items[i+1];
+                title2=item.volumeInfo.title;
+                author2=item.volumeInfo.authors;
+                publisher2=item.volumeInfo.publisher;
+                price2=item.saleInfo && item.saleInfo.listPrice ? item.saleInfo.listPrice.amount: "0";
+                current2=item.saleInfo && item.saleInfo.listPrice ? item.saleInfo.listPrice.currencyCode: "Not available";
+
+                outputList.innerHTML+='<div class="row">'+
+                    formatOutput(title1,author1,publisher1,price1,current1)+
+                    formatOutput(title2,author2,publisher2,price2,current2)+
+                '</div>';
+            }
+        }
+        function formatOutput(title,author,publisher,price,current){
+            var htmlCard=`
+                             <h5 class="card-title">${title}</h5>
+                             <p class="card-text">Author:${author}</p>
+                             <p class ="card-text">Price:${price} Currency:${current}</p>
+                             <button class="Buy" data-title="${title}" data-author="${author}" onclick="">Купить</button>
+`
+            return htmlCard;
+        }
+        function displayError(){
+            alert("ERROR")
+        }
+        $(document).on("click",".Buy",function(){
+            InfoBook=$(this).data("title");
+            InfoAuthor=$(this).data("author");
+            $("#delete-soon").empty();
+            displayInput();
+            console.log("title: ",InfoBook);
+            console.log(" author: ",InfoAuthor);
+            function displayInput(){
+                inputList.innerHTML+='<form class="form">'+
+                    formatInput()+
+                    '</form>';
+            }
+            function formatInput(){
+                var htmlCard1=`
+                                <h1 class="Form">Fill the form</h1>
+                                <input id="input-name" type="text" placeholder="Name">
+                                <input id="input-email" type="text" placeholder="Email">
+                                <input id="input-address" type="text" placeholder="address">
+                                <input id="input-phoneNumber" type="text" placeholder="phone number">
+                                <button id="Upload">Отправить</button>
+`
+                name=document.getElementById("input-name")
+                address=document.getElementById("input-address")
+                email=document.getElementById("input-email")
+                phone=document.getElementById("input-phoneNumber")
+                return htmlCard1;
+            }
+        });
+    })
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
